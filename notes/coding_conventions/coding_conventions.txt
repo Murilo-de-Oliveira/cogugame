@@ -1,0 +1,32 @@
+**CONVENÇÕES RECOMENDADAS PARA O GAMEMAKER**
+
+Nomes de variáveis: 
+	camelCase para variáveis locais e parâmetros
+
+Nomes de funções: 
+	snake_case para funções globais
+	_ ou __ para funções auxiliares ou privadas
+	
+Nomes de scripts/módulos:
+	prefixar pelo contexto: obj_, scr_, spr_
+	
+Nomes de structs (constructors):
+	usar PascalCase
+
+Nomes de constantes (Macros):
+	#macro MAIUSCULAS_COM_UNDERSCORE
+	
+Organização do código:
+	1 script = 1 função principal (mais funções auxiliares privadas, se necessário).
+	Funções longas → quebre em funções menores (manutenção mais fácil).
+	Comente apenas o que não é óbvio. Excesso de comentários = ruído.
+	
+Eventos:
+	Use eventos apenas para orquestração, não para lógica pesada.
+	A lógica principal deve estar em funções/scripts externos.
+
+JSDoc (documentação):
+	Sempre documente funções públicas.
+	Use @ignore para funções auxiliares que não devem aparecer no autocomplete.
+	Tipos claros ajudam muito o Feather (autocompletar).
+	
