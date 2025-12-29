@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Gerador de Personagens RPG</title>
+<style>
+body { font-family: Arial; max-width: 900px; margin: auto; }
+input, select, textarea { width: 100%; margin: 4px 0; }
+fieldset { margin-top: 20px; }
+</style>
+</head>
+
+<body>
+<h1>Gerador de Personagens – GameMaker RPG</h1>
+
+<fieldset>
+<legend>Informações Básicas</legend>
+<label>ID</label><input id="id">
+<label>Nome</label><input id="name">
+<label>Tipo</label>
+<select id="type">
+    <option>Hero</option>
+    <option>Enemy</option>
+    <option>NPC</option>
+</select>
+</fieldset>
+
+<fieldset>
+<legend>Stats Base</legend>
+<label>HP</label><input id="hp" type="number">
+<label>MP</label><input id="mp" type="number">
+<label>STR</label><input id="str" type="number">
+<label>DEX</label><input id="dex" type="number">
+<label>CON</label><input id="con" type="number">
+<label>INT</label><input id="int" type="number">
+<label>FAI</label><input id="fai" type="number">
+<label>LCK</label><input id="lck" type="number">
+</fieldset>
+
+<fieldset>
+<legend>Growth</legend>
+<label>HP</label><input id="g_hp" type="number" step="0.1">
+<label>MP</label><input id="g_mp" type="number" step="0.1">
+<label>STR</label><input id="g_str" type="number" step="0.1">
+<label>DEX</label><input id="g_dex" type="number" step="0.1">
+<label>CON</label><input id="g_con" type="number" step="0.1">
+<label>INT</label><input id="g_int" type="number" step="0.1">
+<label>FAI</label><input id="g_fai" type="number" step="0.1">
+<label>LCK</label><input id="g_lck" type="number" step="0.1">
+</fieldset>
+
+<fieldset>
+<legend>Skills</legend>
+<textarea id="skills" rows="4" placeholder="fireball, attack_basic, heal_small"></textarea>
+</fieldset>
+
+<button onclick="gerar()">Exportar JSON</button>
+
+<textarea id="saida" rows="20" style="margin-top:20px;"></textarea>
+
+<script>
+function gerar(){
+    const obj = {
+        id: Number(id.value),
+        name: name.value,
+        type: type.value,
+        base_stats: {
+            hp: Number(hp.value),
+            mp: Number(mp.value),
+            strength: Number(str.value),
+            dexterity: Number(dex.value),
+            constitution: Number(con.value),
+            intelligence: Number(int.value),
+            faith: Number(fai.value),
+            luck: Number(lck.value)
+        },
+        growth: {
+            hp: Number(g_hp.value),
+            mp: Number(g_mp.value),
+            strength: Number(g_str.value),
+            dexterity: Number(g_dex.value),
+            constitution: Number(g_con.value),
+            intelligence: Number(g_int.value),
+            faith: Number(g_fai.value),
+            luck: Number(g_lck.value)
+        },
+        combat: {
+            skills: skills.value.split(",").map(s => s.trim())
+        }
+    };
+    saida.value = JSON.stringify(obj, null, 2);
+}
+</script>
+
+</body>
+</html>

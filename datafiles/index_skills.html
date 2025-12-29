@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Gerador de Skills para JRPG</title>
+<style>
+body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; }
+label { font-weight: bold; display: block; margin-top: 10px; }
+input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; }
+button { margin-top: 15px; padding: 10px; width: 100%; font-size: 16px; }
+pre { background: #eee; padding: 15px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<h2>Gerador de Skills</h2>
+
+<label>ID:</label>
+<input id="id" type="number" min="0">
+
+<label>Nome:</label>
+<input id="name" type="text">
+
+<label>Descrição:</label>
+<textarea id="description"></textarea>
+
+<label>Custo MP:</label>
+<input id="mp_cost" type="number">
+
+<label>Tipo:</label>
+<select id="type">
+    <option>Physical</option>
+    <option>Magical</option>
+    <option>Healing</option>
+    <option>Buff</option>
+    <option>Debuff</option>
+</select>
+
+<label>Valor Base:</label>
+<input id="value" type="number">
+
+<label>Alvo:</label>
+<select id="target">
+    <option>self</option>
+    <option>single_enemy</option>
+    <option>single_ally</option>
+    <option>all_enemies</option>
+    <option>all_allies</option>
+    <option>party</option>
+</select>
+
+<label>Tem AOE?</label>
+<select id="aoe">
+    <option value="false">false</option>
+    <option value="true">true</option>
+</select>
+
+<label>Função de Efeito (GML):</label>
+<input id="effect_function" type="text">
+
+<label>Função de VFX (GML):</label>
+<input id="vfx_function" type="text">
+
+<button onclick="generate()">Gerar JSON</button>
+
+<h3>Resultado:</h3>
+<pre id="output"></pre>
+
+<script>
+function generate(){
+    const skill = {
+        id: parseInt(document.getElementById('id').value),
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        mp_cost: parseInt(document.getElementById('mp_cost').value),
+        type: document.getElementById('type').value,
+        value: parseInt(document.getElementById('value').value),
+        target: document.getElementById('target').value,
+        aoe: document.getElementById('aoe').value === "true",
+        effect_function: document.getElementById('effect_function').value,
+        vfx_function: document.getElementById('vfx_function').value
+    };
+
+    document.getElementById("output").textContent = JSON.stringify(skill, null, 2);
+}
+</script>
+
+</body>
+</html>

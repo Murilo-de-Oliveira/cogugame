@@ -1,70 +1,34 @@
 /// @description Insert description here
 // You can write your code in this editor
 
-character_info = {
-	name: "",
-	icon: noone,
-	level: 0,
-	xp: 0,
-	xp_to_next_level: 100,
-	class: ""
-};
+//char_id = -1;
+//name = "";
+//sprite = {};
+//stats = {};
+//resistances = {};
+//grid_x = 0;
+//grid_y = 0;
 
-equipments = {
-	helmet: noone,
-	weapon: noone,
-	armor: noone,
-	accessory1: noone,
-	accessory2: noone
-};
+function create_character(_char_id, _name, _sprites, _stats, _resistances, _grid_x, _grid_y){
+	char_id = _char_id;
+	char_type = "Hero";
+	name = _name;
+	sprite = _sprites;
+	stats = _stats;
+	resistances = _resistances;
+	skills = [
+		{"name": "skill1", "cost": 23, "desc": "Magia 1"}, 
+		{"name": "skill2", "cost": 11, "desc": "Magia 22222222222222 2222222222 22222222222222 22222222222222222222222222222 222222222222222222222222222222222222222222222222 222222222222222222222222222 2222222222222222222"}
+	];
+	grid_x = _grid_x;
+	grid_y = _grid_y;
+	x = grid_x * 32;
+	y = grid_y * 32;
+}
 
-sprites = {
-    idle: noone,
-    attack: noone,
-    hurt: noone,
-    dead: noone
-};
+is_defending = false;
+is_side = false;
+is_dead = false;
 
-combat_info = {
-	hp_max: 0,
-	mp_max: 0,
-    hp: 0,
-    mp: 0,
-	is_defending: false,
-	status_effect: {},
-	
-	skills: [],
-	
-	attributes_base: {
-		strength: 0,
-		dexterity: 0,
-		constitution : 0,
-		intelligence: 0,
-		faith: 0,
-		lucky: 0
-	},
-	attributes_final: {
-		strength: 0,
-		dexterity: 0,
-		constitution : 0,
-		intelligence: 0,
-		faith: 0,
-		lucky: 0
-	},
-	resistances: {
-    	physic: 0,
-		magic: 0,
-		fire: 0,
-		ice: 0,
-		poison: 0,
-		bleeding: 0,
-		lightning: 0, 
-		dark: 0,
-		divine: 0
-    },
-	
-	battle_position: "Vanguarda",
-	recalculate_stats: function(){}
-};
-
-combat_info.recalculate_stats();
+show_debug_message("Posição X: " + string(x));
+show_debug_message("Posição Y: " + string(y));

@@ -1,0 +1,12 @@
+{
+  "id": 0,
+  "name": "Fireball",
+  "description": "Lança uma bola de fogo que causa dano mágico.",
+  "mp_cost": 8,
+  "type": "Magical",
+  "value": 22,
+  "target": "single_enemy",
+  "aoe": false,
+  "effect_function": "effect_fireball",
+  "vfx_function": "vfx_fireball"
+}

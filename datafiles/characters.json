@@ -1,0 +1,28 @@
+[
+  {
+    "id": 0,
+    "name": "Eric",
+    "sprites": {
+      "idle": "s_eric_idle"
+    },
+    "stats": {
+      "max_hp": 100,
+      "max_mp": 100,
+      "strength": 10,
+      "dexterity": 10,
+      "constitution": 10,
+      "intelligence": 10,
+      "faith": 10,
+      "lucky": 10
+    },
+    "resistances": {
+      "physical": 1.0,
+      "magic": 1.0,
+      "fire": 1.0,
+      "ice": 1.0,
+      "lightning": 1.0,
+      "dark": 1.0,
+      "divine": 1.0
+    }
+  }
+]

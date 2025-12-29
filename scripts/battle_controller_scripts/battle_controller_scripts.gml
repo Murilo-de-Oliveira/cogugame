@@ -1,101 +1,127 @@
+function _sort_queue(){
+	array_sort(turn_queue, function(char1, char2){
+		return char2.stats.dexterity - char1.stats.dexterity;
+	});
+}
+
 function scr_battle_controller_setup(){
-	//recebe os valores de inimigos e players
-	player_party_instances = [
-		struct_deep_copy(global.PlayableCharacters[CHAR_ID.ERIC]), 
-		struct_deep_copy(global.PlayableCharacters[CHAR_ID.UGU])
-	];
-	enemy_party_instances = [
-		struct_deep_copy(global.Enemies[ENEMY_ID.GOBLIN])
-	];
-	// Dando as novas skills para ERIC (foco físico)
+	eric = instance_create_layer(0, 0, "Characters", obj_entity);
+	ugu = instance_create_layer(0, 0, "Characters", obj_entity);
+	eric.create_character(
+		Characters.ERIC,
+		"Eric",
+		{ "idle": spr_eric },
+	    {
+	      max_hp: 100,
+	      max_mp: 100,
+	      strength: 10,
+	      dexterity: 10,
+	      constitution: 10,
+	      intelligence: 10,
+	      faith: 10,
+	      lucky: 10
+	    },
+	    {
+	      physical: 1.0,
+	      magic: 1.0,
+	      fire: 1.0,
+	      ice: 1.0,
+	      lightning: 1.0,
+	      dark: 1.0,
+	      divine: 1.0
+	    },
+		3,
+		1
+	);
+	ugu.create_character(
+		Characters.UGU,
+		"Ugu",
+		{ "idle": spr_eric },
+	    {
+	      max_hp: 100,
+	      max_mp: 100,
+	      strength: 10,
+	      dexterity: 10,
+	      constitution: 10,
+	      intelligence: 10,
+	      faith: 10,
+	      lucky: 10
+	    },
+	    {
+	      physical: 1.0,
+	      magic: 1.0,
+	      fire: 1.0,
+	      ice: 1.0,
+	      lightning: 1.0,
+	      dark: 1.0,
+	      divine: 1.0
+	    },
+		2,
+		1
+	);
+
+	//var Goblin = {
+	//	hp: 100,
+	//	mp: 100,
+	//	str: 10,
+	//	dex: 10,
+	//	con: 10,
+	//	int: 10,
+	//	fth: 10,
+	//	car: 10,
+	//	grid_x: 1,
+	//	grid_y: 6
+	//};
 	
-    // Dando as novas skills para UGU (foco mágico)
+	player_party_instances = [eric, ugu];
+	//enemy_party_instances = [Goblin];
+	enemy_party_instances = [];
 	
 	var _player_side_columns = 5;
 	var _enemy_side_columns = 5;
 	
 	for (var _i = 0; _i < array_length(player_party_instances); _i++){
 		var _character = player_party_instances[_i];
-		var _desired_position = _character.combat_info.battle_position;
+		var _desired_position = [_character.grid_x, _character.grid_y];
 		
-		var _cell_cords = scr_find_free_cell_player_side(_desired_position, _player_side_columns);
-		
-		if(_cell_cords != undefined){
-			scr_set_occupant(_cell_cords[0], _cell_cords[1], _character);
-		}
-		else {
-			show_debug_message("⚠ Não há célula livre para " + _desired_position);
-		}
+		scr_set_occupant(_desired_position[0], _desired_position[1], _character);
+		show_debug_message(_character.name + " adicionado ao grid");
 	}
 	
 	for (var _i = 0; _i < array_length(enemy_party_instances); _i++){
 		var _enemy = enemy_party_instances[_i];
-		var _desired_position = _enemy.combat_info.battle_position;
+		var _desired_position = [_enemy.grid_x, _enemy.grid_y];
 		
-		var _cell_cords = scr_find_free_cell_enemy_side(_desired_position, _enemy_side_columns);
-		
-		if(_cell_cords != undefined){
-			scr_set_occupant(_cell_cords[0], _cell_cords[1], _enemy);
-		}
-		else {
-			show_debug_message("⚠ Não há célula livre para " + _desired_position);
-		}
+		scr_set_occupant(_desired_position[0], _desired_position[1], _enemy);
 	}
 	
 	turn_queue = array_concat(player_party_instances, enemy_party_instances);
-	array_sort(turn_queue, function(char1,char2){
-		return char2.combat_info.attributes_final.dexterity - char1.combat_info.attributes_final.dexterity;
-	});
+	_sort_queue();
+	for(var i = 0; i < array_length(turn_queue); i++){
+		show_debug_message(turn_queue[i].name);
+	}
 	
 	state = BATTLE_STATE.START_TURN;
-	setup_player_hud(); // Chama a montagem do HUD
-	setup_enemy_hud();
 }
 
 function scr_battle_controller_start_turn(){
-	if (array_length(turn_queue) == 0) {
-        // (Aqui poderia ter uma lógica para recriar a fila ou checar vitória/derrota de novo)
-        state = BATTLE_STATE.VICTORY; // Exemplo
-        return;
-    }
-	
 	current_combatant = array_first(turn_queue);
 	
-	if (current_combatant.combat_info.is_dead) {
-        show_debug_message(current_combatant.character_info.name + " está fora de combate. Pulando turno.");
+	if (current_combatant.is_dead) {
+        show_debug_message(current_combatant.name + " está fora de combate. Pulando turno.");
         scr_battle_controller_end_turn(); // Simplesmente encerra o turno dele
         return;
     }
 	
-	if current_combatant.combat_info.is_defending {
-		current_combatant.combat_info.is_defending = false;
+	if current_combatant.is_defending {
+		current_combatant.is_defending = false;
 	}
 	
-	show_debug_message("--- Início do turno de " + current_combatant.character_info.name + " ---");
-    
-	var _effects = current_combatant.combat_info.status_effects;
-	show_debug_message(_effects);
-	
-	for(var _i = 0; _i < array_length(_effects); _i++){
-		var _effect = _effects[_i];
-        
-        // Se o personagem está Atordoado...
-        if (_effect.effect_key == EFFECT_ID.STUN) {
-            show_debug_message(current_combatant.character_info.name + " está atordoado e não pode agir!");
-            
-            // Pula o turno completamente e vai para a lógica de "fim de turno"
-            scr_battle_controller_end_turn();
-            return; // Impede que o resto da função execute
-        }
-	}
-	
-	show_debug_message(typeof(current_combatant));
-	show_debug_message("É inimigo: " + string(is_instanceof(current_combatant, EnemyCharacter)));
-	show_debug_message("É personagem: " + string(is_instanceof(current_combatant, PlayableCharacter)));
-	
-	if (current_combatant.character_type == "Hero"){
+	show_debug_message("--- Início do turno de " + current_combatant.name + " ---");
+
+	if (current_combatant.char_type == "Hero"){
 		show_debug_message("Turno do player");	
-		current_ui_menu = UI_MENU.MAIN;
+		current_ui_menu = UI_BATTLE_MENU_STATE.MAIN;
 		state = BATTLE_STATE.PLAYER_INPUT;
 	}
 	else{
