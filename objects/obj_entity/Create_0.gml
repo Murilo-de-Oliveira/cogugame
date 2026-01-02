@@ -13,7 +13,7 @@ function create_character(_char_id, _name, _sprites, _stats, _resistances, _grid
 	char_id = _char_id;
 	char_type = "Hero";
 	name = _name;
-	sprite = _sprites;
+	sprites = _sprites;
 	stats = _stats;
 	resistances = _resistances;
 	skills = [

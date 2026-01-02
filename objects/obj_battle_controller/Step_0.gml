@@ -10,7 +10,7 @@ if (true) {
 	        break;
         
 	    case BATTLE_STATE.PLAYER_INPUT:
-	        //scr_battle_controller_player_input();
+	        scr_battle_controller_player_input();
 	        break; // Fim do case PLAYER_INPUT
 		
 		case BATTLE_STATE.TARGET_ENEMY:

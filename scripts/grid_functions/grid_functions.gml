@@ -19,7 +19,7 @@ function scr_get_cell_info(grid_x, grid_y) {
 /// @param {Real} grid_x				A coordenada X no grid.
 /// @param {Real} grid_y				A coordenada Y no grid.
 /// @param {Struct.PlayableCharacter|Struct.EnemyCharacter|noone} _char			O personagem/inimigo a ocupar a célula, ou 'noone' para esvaziar.
-/// @description						Atualiza o ocupante de uma célula no grid.
+/// @description						Atualiza  o ocupante de uma célula no grid.
 /// @return {}							Retorna vazio.
 function scr_set_occupant(grid_x, grid_y, _char) {
     var _cell = scr_get_cell_info(grid_x, grid_y);
@@ -50,4 +50,11 @@ function scr_get_occupant(grid_x, grid_y) {
         return _cell.occupant;
     }
     return undefined; // Retorna undefined se a célula não existe
+}
+
+function get_grid_position(pos_x, pos_y) {
+	var result_x = (round(pos_x / (cell_size)));
+	var result_y = (round(pos_y / (cell_size))) + 1;
+	
+	return [result_x, result_y];
 }

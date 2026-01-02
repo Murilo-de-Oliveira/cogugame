@@ -18,6 +18,11 @@ for(var i = 0; i < array_length(battle_options); i++){
 		if (mouse_check_button_pressed(mb_left)) {
 			current_ui_menu = UI_BATTLE_MENU_STATE.SKILLS;
 			skill_list = obj_battle_controller.current_combatant.skills;
+			current_combatant_icon = obj_battle_controller.current_combatant.sprites[$ "idle"];
 		}
     }
+}
+
+if (keyboard_check_pressed(vk_escape)) {
+	current_ui_menu = UI_BATTLE_MENU_STATE.MAIN;
 }

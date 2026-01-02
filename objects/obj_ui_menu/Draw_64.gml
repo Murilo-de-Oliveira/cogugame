@@ -3,6 +3,10 @@
 
 draw_rectangle(width * 0.03, menu_height, width * 0.97, height * 0.97, true);
 
+if (current_combatant_icon) {
+	draw_sprite_ext(current_combatant_icon, 0, width * 0.05, menu_height, 5, 5, 0, c_white, 1);
+}
+
 if (current_ui_menu == UI_BATTLE_MENU_STATE.MAIN){
 	for (var i = 0; i < array_length(battle_options); i++) {
 	    var _y1 = pos_y + (i * gap_in_items);
