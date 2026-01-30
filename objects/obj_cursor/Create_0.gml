@@ -1,4 +1,9 @@
 /// @description Insert description here
 // You can write your code in this editor
 
-count = 0;
+is_visible = false;
+
+function update_position(combatant) {
+	x = combatant.x;
+	y = combatant.y;
+}

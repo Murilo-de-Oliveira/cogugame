@@ -1,20 +1,30 @@
 /// @description Insert description here
 // You can write your code in this editor
 
-height = display_get_gui_height();
-width = display_get_gui_width();
+ui_state = UI_BATTLE_MENU_STATE.MAIN_MENU;
 
-menu_height = height * 0.7;
+layout = {
+	margin_x: display_get_gui_width() * 0.05,
+	margin_y : display_get_gui_height() * 0.7,
+    menu_width : 180,
+    item_height : 28
+};
 
-current_combatant_icon = noone;
-
-current_ui_menu = UI_BATTLE_MENU_STATE.MAIN;
-battle_options = ["Atacar", "Habilidade", "Defender", "Mover", "Item", "Fugir"];
-selected_option = 0;
+main_menu = ["Atacar", "Habilidade", "Defender", "Mover", "Item", "Fugir"];
+main_selected = 0;
 
 skill_list = [];
-skill_menu_selected = 0;
+skill_selected = 0;
 
-pos_x = width * 0.2;
-pos_y = height * 0.7;
-gap_in_items = 32;
+targets = [];
+target_selected = [];
+
+hover_target = noone;
+
+x_scale = 0;
+y_scale = 0;
+
+function convert_to_gui(){
+	x_scale = display_get_gui_width() / room_width;
+	y_scale = display_get_gui_height() / room_height;
+}

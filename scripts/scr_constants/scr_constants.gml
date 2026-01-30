@@ -36,11 +36,12 @@ enum BATTLE_STATE {
 }
 
 enum UI_BATTLE_MENU_STATE {
-	MAIN,
-    SKILLS,
-	MOVE,
-    ITEMS, // Já podemos deixar preparado para o futuro
-    TARGETING
+	MAIN_MENU,
+    SKILL_MENU,
+	MOVE_MENU,
+    ITEM_MENU, 
+    TARGET_SELECT,
+	BUSY
 }
 
 enum UI_GAME_MENU_STATE {
@@ -50,6 +51,15 @@ enum UI_GAME_MENU_STATE {
 	CHARACTERS,
 	INVENTORY,
 	QUIT
+}
+
+enum ACTION_TYPE {
+	ATTACK,
+	SKILL,
+	DEFEND,
+	MOVE,
+	ITEM,
+	RUN
 }
 
 enum Stats {

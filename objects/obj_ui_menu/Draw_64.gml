@@ -1,46 +1,90 @@
-/// @description Insert description here
-// You can write your code in this editor
+draw_battle_ui();
 
-draw_rectangle(width * 0.03, menu_height, width * 0.97, height * 0.97, true);
-
-if (current_combatant_icon) {
-	draw_sprite_ext(current_combatant_icon, 0, width * 0.05, menu_height, 5, 5, 0, c_white, 1);
-}
-
-if (current_ui_menu == UI_BATTLE_MENU_STATE.MAIN){
-	for (var i = 0; i < array_length(battle_options); i++) {
-	    var _y1 = pos_y + (i * gap_in_items);
-    
-	    // Mudar a cor se o rato estiver por cima (Hover)
-	    draw_set_color(selected_option == i ? c_yellow : c_white);
-    
-	    // Desenhar o retângulo do botão (opcional, para debug)
-	    draw_rectangle(pos_x, _y1, pos_x + 128, _y1 + gap_in_items, true);
-    
-	    // Desenhar o texto
-	    draw_text(pos_x + 10, _y1, battle_options[i]);
+function draw_battle_ui() {
+	
+	draw_menu_box();
+	
+	switch(ui_state) {
+		case UI_BATTLE_MENU_STATE.MAIN_MENU:
+			draw_vertical_menu(main_menu, main_selected);
+			break;
+			
+		case UI_BATTLE_MENU_STATE.SKILL_MENU:
+			draw_skill_menu();
+			break;
+			
+		case UI_BATTLE_MENU_STATE.TARGET_SELECT:
+			draw_target_cursor();
+			draw_enemy_desc();
+			break;
 	}
 }
 
-if (current_ui_menu == UI_BATTLE_MENU_STATE.SKILLS) {
-	for (var i = 0; i < array_length(skill_list); i++) {
-	    var _skill = skill_list[i];
-		
-		var _y1 = pos_y + (i * gap_in_items);
-		
-		if (selected_option == i) {
-			draw_rectangle(width * 0.4, menu_height + 16, width * 0.9, (height * 0.97) - 16, true);
-			draw_text(width * 0.4, menu_height + 16, _skill[$ "name"]);
-			draw_text(width * 0.4, menu_height + 32, "Custo: " + string(_skill[$ "cost"]));
-			draw_text_ext(width * 0.4, menu_height + 48, _skill[$ "desc"], 16, width * 0.9 - width * 0.4)
-		}
-		
-		draw_set_color(selected_option == i ? c_yellow : c_white);
-		
-		draw_rectangle(pos_x, _y1, pos_x + 128, _y1 + gap_in_items, true);
-		
-		draw_text(pos_x + 10, _y1, _skill[$ "name"]);
-	}
+function draw_menu_box() {
+
+    var x1 = layout.margin_x;
+    var y1 = layout.margin_y;
+    var x2 = x1 + layout.menu_width;
+    var y2 = y1 + 180;
+
+    draw_rectangle(x1, y1, x2, y2, true);
 }
 
+function draw_vertical_menu(_items, _selected) {
+
+    for (var i = 0; i < array_length(_items); i++) {
+        var yy = layout.margin_y + i * layout.item_height;
+
+        draw_set_color(i == _selected ? c_yellow : c_white);
+        draw_text(layout.margin_x + 8, yy, _items[i]);
+    }
+}
+
+function draw_skill_menu() {
+
+    draw_vertical_menu(
+        array_map(skill_list, function(s) { return s.name; }),
+        skill_selected
+    );
+
+    var skill = skill_list[skill_selected];
+    draw_text(400, layout.margin_y, skill.desc);
+}
+
+function draw_target_cursor() {
+    var target = targets[target_selected];
+	draw_set_colour(c_red);
+    //draw_rectangle(
+	//	target.x * x_scale, 
+	//	target.y * y_scale, 
+	//	(target.x + 32) * x_scale, 
+	//	(target.y + 32) * y_scale, 
+	//	true
+	//);
+	draw_circle(
+		(target.x + 16) * x_scale, 
+		(target.y + 16) * y_scale,
+		64,
+		true
+	);
+}
+
+function draw_enemy_desc(){
+	var target = targets[target_selected];
+	
+	var x1 = layout.margin_x + layout.menu_width;
+    var y1 = layout.margin_y;
+    var x2 = display_get_gui_width() * 0.97;
+    var y2 = y1 + 180;
+	
+	draw_set_colour(-1);
+	
+	draw_sprite_ext(spr_char_icon_base, 0, x1 + 32, y1 + 16, 4, 4, 0, c_white, 1);
+	target.show_status(x1 + 160, y1 + 16);
+
+	draw_rectangle(x1, y1, x2, y2, true);
+}
+
+draw_set_font(-1);
 draw_set_colour(-1);
+

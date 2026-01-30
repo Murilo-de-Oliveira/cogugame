@@ -5,8 +5,10 @@ function _sort_queue(){
 }
 
 function scr_battle_controller_setup(){
-	eric = instance_create_layer(0, 0, "Characters", obj_entity);
-	ugu = instance_create_layer(0, 0, "Characters", obj_entity);
+	eric = instance_create_layer(0, 0, "Characters", obj_hero);
+	ugu = instance_create_layer(0, 0, "Characters", obj_hero);
+	goblin1 = instance_create_layer(0, 0, "Characters", obj_enemy);
+	goblin2 = instance_create_layer(0, 0, "Characters", obj_enemy);
 	eric.create_character(
 		Characters.ERIC,
 		"Eric",
@@ -60,22 +62,62 @@ function scr_battle_controller_setup(){
 		1
 	);
 
-	//var Goblin = {
-	//	hp: 100,
-	//	mp: 100,
-	//	str: 10,
-	//	dex: 10,
-	//	con: 10,
-	//	int: 10,
-	//	fth: 10,
-	//	car: 10,
-	//	grid_x: 1,
-	//	grid_y: 6
-	//};
+	goblin1.create_character(
+		Characters.UGU,
+		"Goblin",
+		{ "idle": spr_hero_dummy , "icon": spr_char_icon_base},
+	    {
+	      max_hp: 100,
+	      max_mp: 100,
+	      strength: 10,
+	      dexterity: 5,
+	      constitution: 5,
+	      intelligence: 5,
+	      faith: 10,
+	      lucky: 10
+	    },
+	    {
+	      physical: 1.0,
+	      magic: 1.0,
+	      fire: 1.0,
+	      ice: 1.0,
+	      lightning: 1.0,
+	      dark: 1.0,
+	      divine: 1.0
+	    },
+		6,
+		1
+	);
+	
+	goblin2.create_character(
+		Characters.UGU,
+		"Goblin",
+		{ "idle": spr_hero_dummy , "icon": spr_char_icon_base},
+	    {
+	      max_hp: 100,
+	      max_mp: 100,
+	      strength: 10,
+	      dexterity: 10,
+	      constitution: 10,
+	      intelligence: 10,
+	      faith: 10,
+	      lucky: 10
+	    },
+	    {
+	      physical: 1.0,
+	      magic: 1.0,
+	      fire: 1.0,
+	      ice: 1.0,
+	      lightning: 1.0,
+	      dark: 1.0,
+	      divine: 1.0
+	    },
+		6,
+		2
+	);
 	
 	player_party_instances = [eric, ugu];
-	//enemy_party_instances = [Goblin];
-	enemy_party_instances = [];
+	enemy_party_instances = [goblin1, goblin2];
 	
 	var _player_side_columns = 5;
 	var _enemy_side_columns = 5;
@@ -100,6 +142,11 @@ function scr_battle_controller_setup(){
 	for(var i = 0; i < array_length(turn_queue); i++){
 		show_debug_message(turn_queue[i].name);
 	}
+
+	//if !instance_exists(obj_cursor){
+	//	instance_create_layer(0, 0, "Instances", obj_cursor);
+	//	show_debug_message("Cursor criado");
+	//}
 	
 	if !instance_exists(obj_ui_battle_banner){
 		instance_create_layer(
@@ -115,6 +162,9 @@ function scr_battle_controller_setup(){
 
 function scr_battle_controller_start_turn(){
 	current_combatant = array_first(turn_queue);
+	
+	//obj_cursor.update_position(current_combatant);
+	obj_cursor.is_visible = true;
 	
 	if (current_combatant.is_dead) {
         show_debug_message(current_combatant.name + " está fora de combate. Pulando turno.");
@@ -139,25 +189,12 @@ function scr_battle_controller_start_turn(){
 }
 
 function scr_battle_controller_player_input(){
-	// TODA a lógica de input do jogador agora vive aqui dentro.
-    
 	if (!instance_exists(obj_ui_menu)) {
 		instance_create_layer(0, 0, "Instances", obj_ui_menu);
 	}
 	
-    // 1. Lógica de seleção de personagem no grid com o mouse
-    //if (mouse_check_button_pressed(mb_left)) {
-    //    var _cell_width = 64;
-    //    var _cell_height = 64;
-    //    var _grid_x = floor(mouse_x / _cell_width);
-    //    var _grid_y = floor(mouse_y / _cell_height);
-
-    //    if (_grid_x >= 0 && _grid_x < ds_grid_width(global.grid) && _grid_y >= 0 && _grid_y < ds_grid_height(global.grid)) {
-    //        selected_character = global.grid[# _grid_x, _grid_y].occupant;
-    //    } else {
-    //        selected_character = noone;
-    //    }
-    //}
+	obj_ui_menu.is_player_turn = true;
+	obj_ui_menu.current_combatant_icon = current_combatant.sprites[$ "idle"];
     
     //// 2. Lógica de navegação nos menus da UI com o teclado
     //switch (current_ui_menu) {
@@ -323,9 +360,11 @@ function scr_battle_controller_player_input(){
 		
 	//		break;
     //}
+	
+	//obj_ui_menu.is_player_turn = false;
 }
 
-function scr_battle_controller_target_enemy(){
+function scr_battle_controller_target_select(){
 	var _chosen_item_struct = chosen_item;
 	
 	if(keyboard_check(vk_escape)){

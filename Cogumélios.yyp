@@ -28,7 +28,9 @@
     {"$GMFolder":"","%Name":"Tile Sets","folderPath":"folders/Tile Sets.yy","name":"Tile Sets","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Timelines","folderPath":"folders/Timelines.yy","name":"Timelines","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
-  "ForcedPrefabProjectReferences":[],
+  "ForcedPrefabProjectReferences":[
+    {"link":"io.gamemaker.sdfshaders-1.0.0","name":"io.gamemaker.sdfshaders-1.0.0","path":"io.gamemaker.sdfshaders-1.0.0.yyp",},
+  ],
   "IncludedFiles":[
     {"$GMIncludedFile":"","%Name":"characters.json","CopyToMask":-1,"filePath":"datafiles","name":"characters.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"enemies.json","CopyToMask":-1,"filePath":"datafiles","name":"enemies.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
@@ -51,6 +53,7 @@
     {"id":{"name":"obj_battle_controller","path":"objects/obj_battle_controller/obj_battle_controller.yy",},},
     {"id":{"name":"obj_cursor","path":"objects/obj_cursor/obj_cursor.yy",},},
     {"id":{"name":"obj_enemy_ai_test","path":"objects/obj_enemy_ai_test/obj_enemy_ai_test.yy",},},
+    {"id":{"name":"obj_enemy","path":"objects/obj_enemy/obj_enemy.yy",},},
     {"id":{"name":"obj_entity","path":"objects/obj_entity/obj_entity.yy",},},
     {"id":{"name":"obj_ex_1","path":"objects/obj_ex_1/obj_ex_1.yy",},},
     {"id":{"name":"obj_ex_2","path":"objects/obj_ex_2/obj_ex_2.yy",},},
