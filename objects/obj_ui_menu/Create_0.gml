@@ -21,6 +21,10 @@ target_selected = [];
 
 hover_target = noone;
 
+action = -1;
+
+is_player_turn = false;
+
 x_scale = 0;
 y_scale = 0;
 

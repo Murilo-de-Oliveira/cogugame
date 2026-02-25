@@ -25,11 +25,9 @@ enum BATTLE_STATE {
 	SETUP,
 	START_TURN,
 	PLAYER_INPUT,
-	TARGET_ENEMY,
-	TARGET_ALLY,
 	ENEMY_DECISION,
-	EXECUTE_ACTION,
 	RESOLVE_ACTION,
+	END_TURN,
 	VICTORY,
 	DEFEAT,
 	NOTHING
@@ -62,7 +60,7 @@ enum ACTION_TYPE {
 	RUN
 }
 
-enum Stats {
+enum STATS {
 	HP_MAX,
 	MP_MAX,
 	HP,
@@ -72,7 +70,8 @@ enum Stats {
 	CON,
 	INT,
 	FTH,
-	LCK
+	LCK,
+	COUNT
 }
 
 enum Element {

@@ -10,6 +10,9 @@ switch(ui_state){
     case UI_BATTLE_MENU_STATE.TARGET_SELECT:
         ui_step_target();
         break;
+	
+	case UI_BATTLE_MENU_STATE.BUSY:
+		break;
 }
 
 function ui_step_main(){
@@ -22,13 +25,15 @@ function ui_step_main(){
 	if (keyboard_check_pressed(vk_enter)) {
 		switch (main_selected) {
 			case ACTION_TYPE.ATTACK:
-				prepare_targeting(ACTION_TYPE.ATTACK);
+				action = ACTION_TYPE.ATTACK;
+				prepare_targeting();
 				break;
 			
 			case ACTION_TYPE.SKILL:
-				skill_list = obj_battle_controller.current_combatant.skills;
+				skill_list = obj_battle_controller.current_combatant.skill_list;
 				ui_state = UI_BATTLE_MENU_STATE.SKILL_MENU;
 				main_selected = 0;
+				action = ACTION_TYPE.SKILL;
 				break;
 		}
 	}
@@ -48,7 +53,9 @@ function ui_step_skills(){
 	}
 	
 	if (keyboard_check_pressed(vk_enter)){
-		prepare_targeting(ACTION_TYPE.SKILL);
+		prepare_targeting();
+		obj_battle_controller.chosen_skill = obj_battle_controller.current_combatant.skill_list[0];
+		show_debug_message("Skill utilizada: " + string(obj_battle_controller.chosen_skill));
 		skill_selected = 0;
 	}
 }
@@ -67,29 +74,19 @@ function ui_step_target(){
         return;
     }
 	
-	if (keyboard_check_pressed(vk_enter)) {
-		confirm_action();
+	if keyboard_check_pressed(vk_enter){
+		obj_battle_controller.chosen_action = action;
+		obj_battle_controller.chosen_targets = targets[target_selected];
+		
+		ui_state = UI_BATTLE_MENU_STATE.BUSY;
 	}
 }
 
-function prepare_targeting(_action) {
+function prepare_targeting() {
 	
 	//separar em tipo de skill (single target, todos, aliados, etc)
-	targets = obj_battle_controller.get_valid_targets(_action);
+	targets = obj_battle_controller.get_valid_targets(action);
 	target_selected = 0;
 	
-	obj_battle_controller.chosen_action = _action;
 	ui_state = UI_BATTLE_MENU_STATE.TARGET_SELECT;
-}
-
-function confirm_action() {
-	var target = targets[target_selected];
-	
-	obj_battle_controller.commit_action(
-		chosen_action,
-		ui_state == UI_BATTLE_MENU_STATE.SKILL_MENU ? skill_list[skill_select] : undefined,
-		target
-	);
-	
-	ui_state = UI_BATTLE_MENU_STATE.BUSY;
 }

@@ -1,10 +1,27 @@
-function _sort_queue(){
+function _debug_timer(){
+	return string(current_time/1000) + "ms";
+}
+
+function _sort_turn_queue(){
 	array_sort(turn_queue, function(char1, char2){
-		return char2.stats.dexterity - char1.stats.dexterity;
+		if(char1.stats.dexterity.get_total() > char2.stats.dexterity.get_total()) return -1;
+		if(char1.stats.dexterity.get_total() < char2.stats.dexterity.get_total()) return 1;
+		
+		if(char1.order > char2.order) return -1;
+		if(char1.order < char2.order) return 1;
+		
+		return 0;
 	});
 }
 
+function _rotate_turn_queue(){
+	var previous_char = array_shift(turn_queue);
+	array_push(turn_queue, previous_char);
+}
+
 function scr_battle_controller_setup(){
+	show_debug_message("Setup iniciado " + _debug_timer());
+	
 	eric = instance_create_layer(0, 0, "Characters", obj_hero);
 	ugu = instance_create_layer(0, 0, "Characters", obj_hero);
 	goblin1 = instance_create_layer(0, 0, "Characters", obj_enemy);
@@ -16,12 +33,14 @@ function scr_battle_controller_setup(){
 	    {
 	      max_hp: 100,
 	      max_mp: 100,
-	      strength: 10,
-	      dexterity: 10,
-	      constitution: 10,
-	      intelligence: 10,
-	      faith: 10,
-	      lucky: 10
+		  hp: 100,
+		  mp: 100,
+	      strength: new Attribute(10),
+	      dexterity: new Attribute(10),
+	      constitution: new Attribute(10),
+	      intelligence: new Attribute(10),
+	      faith: new Attribute(10),
+	      lucky: new Attribute(10)
 	    },
 	    {
 	      physical: 1.0,
@@ -32,6 +51,10 @@ function scr_battle_controller_setup(){
 	      dark: 1.0,
 	      divine: 1.0
 	    },
+		[
+			new Skill("Bola de Fogo", 1, 20, 60, 80, Element.FIRE, Debuffs.BURN, TargetType.ENEMY, "Atira uma bola de fogo no inimigo"),
+			new Skill("Sopro Gélido", 1, 10, 30, 80, Element.ICE, Debuffs.NONE, TargetType.ENEMY, "Sopra ar gelado no inimigo")
+		],
 		3,
 		1
 	);
@@ -42,12 +65,14 @@ function scr_battle_controller_setup(){
 	    {
 	      max_hp: 100,
 	      max_mp: 100,
-	      strength: 10,
-	      dexterity: 10,
-	      constitution: 10,
-	      intelligence: 10,
-	      faith: 10,
-	      lucky: 10
+		  hp: 100,
+		  mp: 100,
+	      strength: new Attribute(10),
+	      dexterity: new Attribute(10),
+	      constitution: new Attribute(10),
+	      intelligence: new Attribute(10),
+	      faith: new Attribute(10),
+	      lucky: new Attribute(10)
 	    },
 	    {
 	      physical: 1.0,
@@ -58,6 +83,10 @@ function scr_battle_controller_setup(){
 	      dark: 1.0,
 	      divine: 1.0
 	    },
+		[
+			new Skill("Bola de Fogo", 1, 20, 60, 80, Element.FIRE, Debuffs.BURN, TargetType.ENEMY, "Atira uma bola de fogo no inimigo"),
+			new Skill("Sopro Gélido", 1, 10, 30, 80, Element.ICE, Debuffs.NONE, TargetType.ENEMY, "Sopra ar gelado no inimigo")
+		],
 		2,
 		1
 	);
@@ -69,12 +98,14 @@ function scr_battle_controller_setup(){
 	    {
 	      max_hp: 100,
 	      max_mp: 100,
-	      strength: 10,
-	      dexterity: 5,
-	      constitution: 5,
-	      intelligence: 5,
-	      faith: 10,
-	      lucky: 10
+		  hp: 100,
+		  mp: 100,
+	      strength: new Attribute(10),
+	      dexterity: new Attribute(0),
+	      constitution: new Attribute(10),
+	      intelligence: new Attribute(10),
+	      faith: new Attribute(10),
+	      lucky: new Attribute(10)
 	    },
 	    {
 	      physical: 1.0,
@@ -85,6 +116,7 @@ function scr_battle_controller_setup(){
 	      dark: 1.0,
 	      divine: 1.0
 	    },
+		[],
 		6,
 		1
 	);
@@ -96,12 +128,14 @@ function scr_battle_controller_setup(){
 	    {
 	      max_hp: 100,
 	      max_mp: 100,
-	      strength: 10,
-	      dexterity: 10,
-	      constitution: 10,
-	      intelligence: 10,
-	      faith: 10,
-	      lucky: 10
+		  hp: 100,
+		  mp: 100,
+	      strength: new Attribute(10),
+	      dexterity: new Attribute(0),
+	      constitution: new Attribute(10),
+	      intelligence: new Attribute(10),
+	      faith: new Attribute(10),
+	      lucky: new Attribute(10)
 	    },
 	    {
 	      physical: 1.0,
@@ -112,9 +146,15 @@ function scr_battle_controller_setup(){
 	      dark: 1.0,
 	      divine: 1.0
 	    },
+		[],
 		6,
 		2
 	);
+	
+	eric.order = global.spawn_order++;
+	ugu.order = global.spawn_order++;
+	goblin1.order = global.spawn_order++;
+	goblin2.order = global.spawn_order++;
 	
 	player_party_instances = [eric, ugu];
 	enemy_party_instances = [goblin1, goblin2];
@@ -138,7 +178,7 @@ function scr_battle_controller_setup(){
 	}
 	
 	turn_queue = array_concat(player_party_instances, enemy_party_instances);
-	_sort_queue();
+	_sort_turn_queue();
 	for(var i = 0; i < array_length(turn_queue); i++){
 		show_debug_message(turn_queue[i].name);
 	}
@@ -157,11 +197,19 @@ function scr_battle_controller_setup(){
 		);
 	}
 	
+	if (!instance_exists(obj_ui_menu)) {
+		instance_create_layer(0, 0, "Instances", obj_ui_menu);
+	}
+	
+	show_debug_message("Setup finalizado " + _debug_timer());
+	
 	state = BATTLE_STATE.START_TURN;
 }
 
 function scr_battle_controller_start_turn(){
 	current_combatant = array_first(turn_queue);
+	
+	show_debug_message("--- Início do turno de " + current_combatant.name +  " ---" + _debug_timer());
 	
 	//obj_cursor.update_position(current_combatant);
 	obj_cursor.is_visible = true;
@@ -175,279 +223,26 @@ function scr_battle_controller_start_turn(){
 	if current_combatant.is_defending {
 		current_combatant.is_defending = false;
 	}
-	
-	show_debug_message("--- Início do turno de " + current_combatant.name + " ---");
 
 	if (current_combatant.char_type == "Hero"){
-		show_debug_message("Turno do player");	
 		state = BATTLE_STATE.PLAYER_INPUT;
 	}
 	else{
-		show_debug_message("Turno do inimigo");
-		state = BATTLE_STATE.ENEMY_DECISION;
+		//state = BATTLE_STATE.ENEMY_DECISION;
+		state = BATTLE_STATE.NOTHING;
 	}
 }
 
 function scr_battle_controller_player_input(){
-	if (!instance_exists(obj_ui_menu)) {
-		instance_create_layer(0, 0, "Instances", obj_ui_menu);
-	}
-	
 	obj_ui_menu.is_player_turn = true;
+	
 	obj_ui_menu.current_combatant_icon = current_combatant.sprites[$ "idle"];
-    
-    //// 2. Lógica de navegação nos menus da UI com o teclado
-    //switch (current_ui_menu) {
-    //    case UI_MENU.MAIN:
-    //        var _vertical_input = keyboard_check_pressed(vk_down) - keyboard_check_pressed(vk_up);
-    //        if (_vertical_input != 0) {
-    //            selected_option = (selected_option + _vertical_input + array_length(battle_options)) % array_length(battle_options);
-    //        }
-            
-    //        if (keyboard_check_pressed(vk_enter)) {
-	//			if (battle_options[selected_option] == "Atacar"){
-	//				chosen_action = {
-	//					data: global.SkillList.Attack,
-	//					type: "Attack"
-	//				}
-	//				state = BATTLE_STATE.TARGET_ENEMY;
-	//			}
-				
-    //            else if (battle_options[selected_option] == "Habilidade") {
-    //                scr_update_skill_menu_display(); // A função agora prepara e troca o menu
-    //            }
-				
-	//			else if (battle_options[selected_option] == "Defender") {
-    //                // NOME CORRIGIDO para bater com o DB
-    //                chosen_action = {
-	//					data: global.SkillList.Defense,
-	//					type: "Defense"
-	//				} 
-	//				chosen_targets = [current_combatant];
-    //                state = BATTLE_STATE.RESOLVE_ACTION;
-    //            } 
-    //            else if (battle_options[selected_option] == "Mover") {
-    //                // Apenas chama a função para preparar e abrir o menu de movimento
-    //                if(can_move){
-	//					scr_update_move_menu_display();
-	//				}
-    //            }
-	//			else if (battle_options[selected_option] == "Item"){
-	//				scr_update_item_menu_display();
-	//			}
-    //        }
-    //        break;
-            
-    //    case UI_MENU.SKILLS:
-    //        var _vertical_input = keyboard_check_pressed(vk_down) - keyboard_check_pressed(vk_up);
-    //        if (_vertical_input != 0) {
-    //            var _options_total = array_length(current_combatant.combat_info.skills);
-    //            skill_menu_selected = (skill_menu_selected + _vertical_input + _options_total) % _options_total;
-	//			scr_update_skill_menu_display(); // ATUALIZA a UI a cada mudança de seleção
-    //        }
-            
-    //        if (keyboard_check_pressed(vk_escape)) {
-    //            current_ui_menu = UI_MENU.MAIN;
-    //        }
-            
-    //        if (keyboard_check_pressed(vk_enter)) {
-	//			var _skill_id =  current_combatant.combat_info.skills[skill_menu_selected];
-	//		    var _skill_data = global.SkillList[$ _skill_id];
-				
-	//			if(_skill_data.costMp > current_combatant.combat_info.mp){
-	//			    chosen_action = noone;
-    //                show_debug_message("Usuário não tem MP suficiente");
-    //                return; // Sai da lógica para não avançar o estado
-	//			}
-				
-	//			chosen_action = {
-	//				data: _skill_data,
-	//				type: "Skill"
-	//			}
-				
-	//			if (_skill_data.area_of_effect == "AllEnemies") {
-	//			    chosen_targets = enemy_party_instances; // O alvo são todos os inimigos
-	//			    state = BATTLE_STATE.RESOLVE_ACTION;
-	//			} 
-	//			else if (_skill_data.area_of_effect == "Self") {
-	//			    chosen_targets = [current_combatant]; // O alvo é quem usou a skill
-	//			    state = BATTLE_STATE.RESOLVE_ACTION;
-	//			}
-	//			else { // Para SingleTarget, etc.
-	//			    state = BATTLE_STATE.TARGET_ENEMY; // Vai para a tela de mira
-	//			}
-	//		}
-    //        break;
-			
-	//	case UI_MENU.MOVE:
-    //        // LÓGICA DE MOVIMENTO TOTALMENTE REFEITA
-    //        if (array_length(move_menu_options) == 0) break; // Não faz nada se não houver opções
-
-    //        // Navegação vertical usando a variável correta
-    //        var _vertical_input = keyboard_check_pressed(vk_down) - keyboard_check_pressed(vk_up);
-    //        if (_vertical_input != 0) {
-    //            move_menu_selected = (move_menu_selected + _vertical_input + array_length(move_menu_options)) % array_length(move_menu_options);
-    //            // Atualiza a UI para refletir a nova seleção
-    //            scr_update_move_menu_display(); 
-    //        }
-            
-    //        if (keyboard_check_pressed(vk_escape)) {
-    //            current_ui_menu = UI_MENU.MAIN;
-    //        }
-            
-    //        if (keyboard_check_pressed(vk_enter)) {
-    //            // ATRIBUIÇÃO CORRETA: Pega o nome da posição do array de opções
-    //            var _new_position = move_menu_options[move_menu_selected];
-                
-    //            // Encontra uma célula livre na nova posição
-    //            var _cell_cords = scr_find_free_cell_player_side(_new_position, 5); // 5 é o max_columns
-                
-    //            if (_cell_cords != undefined) {
-    //                // Libera a célula antiga
-    //                var _old_cell = global.grid[# current_combatant.combat_info.grid_x, current_combatant.combat_info.grid_y];
-    //                _old_cell.occupied = false;
-    //                _old_cell.occupant = noone;
-                    
-    //                // Ocupa a nova célula
-    //                scr_set_cell_occupant(_cell_cords[0], _cell_cords[1], current_combatant);
-    //                show_debug_message(current_combatant.character_info.name + " moveu-se para " + _new_position);
-    //                current_combatant.combat_info.battle_position = _new_position;
-					
-    //                // Se for flanco, recomeça o turno
-	//				if (_new_position == "Flanco"){
-	//					current_ui_menu =  UI_MENU.MAIN;
-	//					can_move = false;
-	//					selected_option = 0;
-	//				}
-	//				else {
-	//					scr_battle_controller_end_turn();
-	//				}
-    //            } else {
-    //                show_debug_message("Não há espaço para mover para " + _new_position);
-    //                // O jogador pode tentar outra opção
-    //            }
-    //        }
-    //        break;
-		
-	//	case UI_MENU.ITEMS:
-	//		if (global.GameManager.inventory.length == 0) break; // Não faz nada se não houver opções
-
-	//		var _vertical_input = keyboard_check_pressed(vk_down) - keyboard_check_pressed(vk_up);
-    //        var _item_menu_options = variable_struct_get_names(global.GameManager.inventory.items);
-	//		if (_vertical_input != 0) {
-    //            item_menu_selected = (item_menu_selected + _vertical_input + global.GameManager.inventory.length) % global.GameManager.inventory.length;
-    //            // Atualiza a UI para refletir a nova seleção
-    //            scr_update_item_menu_display(); 
-    //        }
-			
-	//		if (keyboard_check_pressed(vk_escape)) {
-    //            current_ui_menu = UI_MENU.MAIN;
-    //        }
-			
-	//		if (keyboard_check_pressed(vk_enter)) {
-	//			var _item_id_string = _item_menu_options[item_menu_selected];
-	//			var _item_data = global.ItemList[int64(_item_id_string)];
-			    
-	//			chosen_action = {
-	//				data: _item_data,
-	//				type: "Item"
-	//			}
-				
-	//			if (_item_data.type == "Consumable") {
-	//			    state = BATTLE_STATE.TARGET_ALLY;
-	//			} 
-	//		}
-		
-	//		break;
-    //}
 	
-	//obj_ui_menu.is_player_turn = false;
-}
-
-function scr_battle_controller_target_select(){
-	var _chosen_item_struct = chosen_item;
-	
-	if(keyboard_check(vk_escape)){
-		state = BATTLE_STATE.PLAYER_INPUT;
-	}
-	
-	if (chosen_action.data.area_of_effect == "SingleTarget"){
-		if (mouse_x >= 0 && mouse_x < room_width && mouse_y >= 0 && mouse_y < 320){
-			var _cell_width = 32;
-			var _cell_height = 32;
-			var _x = floor(mouse_x / _cell_width);
-			var _y = floor(mouse_y / _cell_height);
-			var _hover_cell = ds_grid_get(global.grid, _x, _y);
-			
-			if (mouse_check_button_pressed(mb_left)) {
-			    // ... (código para pegar _hover_cell igual) ...
-			    var _target_occupant = _hover_cell.occupant;
-            
-			    // Se não clicou em ninguém, não faz nada.
-			    if (_target_occupant == noone) return;
-            
-			    // --- LÓGICA DE VALIDAÇÃO REESTRUTURADA ---
-			    var is_valid_target = false;
-            
-			    // A skill quer um inimigo?
-			    if (chosen_action.data.typeTarget == "Enemy") {
-			        // O alvo clicado está na lista de inimigos? (Usando a função nativa)
-			        if (array_contains(enemy_party_instances, _target_occupant)) {
-			            is_valid_target = true;
-			        }
-			    }
-			    // A skill quer um aliado?
-			    else if (chosen_action.data.typeTarget == "Ally") {
-			        // O alvo clicado está na lista de jogadores?
-			        if (array_contains(player_party_instances, _target_occupant)) {
-			            is_valid_target = true;
-			        }
-			    }
-            
-			    // Se o alvo for válido, avança o estado. Senão, avisa e continua na mira.
-			    if (is_valid_target) {
-			        chosen_targets = [_target_occupant];
-			        state = BATTLE_STATE.RESOLVE_ACTION;
-			    } else {
-			        show_debug_message("Alvo Inválido!"); // Feedback para o jogador
-			    }
-			}
-		}	
-	}
-}
-
-function scr_battle_controller_target_ally(){
-	if (keyboard_check_pressed(vk_escape)) {
-		state = BATTLE_STATE.PLAYER_INPUT;
-		current_ui_menu = UI_MENU.ITEMS; // Volta para o menu de itens
-	}
-	
-	if (mouse_x >= 0 && mouse_x < room_width && mouse_y >= 0 && mouse_y < 320){
-		var _cell_width = 32;
-		var _cell_height = 32;
-		var _x = floor(mouse_x / _cell_width);
-		var _y = floor(mouse_y / _cell_height);
-		var _hover_cell = ds_grid_get(global.grid, _x, _y);
-			
-		if (mouse_check_button_pressed(mb_left)) {
-			// ... (código para pegar _hover_cell igual) ...
-			var _target_occupant = _hover_cell.occupant;
-            
-			// Se não clicou em ninguém, não faz nada.
-			if (_target_occupant == noone) return;
-            
-			// --- LÓGICA DE VALIDAÇÃO REESTRUTURADA ---
-			var is_valid_target = false;
-            
-			// A skill quer um inimigo?
-			// VALIDAÇÃO: Verifica se o alvo clicado é um dos jogadores
-	        if (array_contains(player_party_instances, _target_occupant)) {
-	            chosen_targets = [_target_occupant];
-	            state = BATTLE_STATE.RESOLVE_ACTION; // Renomeado de RESOLVE_ACTION
-	        } else {
-	            show_debug_message("Alvo Inválido! (Deve ser um aliado)");
-	        }
-		}
+	if obj_ui_menu.ui_state == UI_BATTLE_MENU_STATE.BUSY{
+		state = BATTLE_STATE.RESOLVE_ACTION;
+		show_debug_message("Em estado de resolve action " + _debug_timer());
+		obj_ui_menu.ui_state = UI_BATTLE_MENU_STATE.MAIN_MENU;
+		obj_ui_menu.is_player_turn = false;
 	}
 }
 
@@ -528,91 +323,94 @@ function scr_battle_controller_resolve_action() {
         scr_battle_controller_end_turn();
         return;
     }
-
-	var _action_data = chosen_action.data;
 	
-	show_debug_message("Action data: " + string(_action_data));
-	var _is_single_target = false;
+	show_debug_message("Ação será commitada");
 	
-	if (struct_get(_action_data, "area_of_effect") != undefined){
-		_is_single_target = (_action_data.area_of_effect == "SingleTarget");
-	}
+	commit_action(
+		chosen_action,
+		chosen_targets
+	);
 	
-	if (is_callable(_action_data.vfx_function)) {
-	    // Itera sobre todos os alvos da ação
-	    for (var i = 0; i < array_length(chosen_targets); i++) {
-	        var _target = chosen_targets[i];
-            
-	        // Calcula a posição central do alvo em pixels
-	        var _vfx_x = (_target.combat_info.grid_x * 32) + 16;
-	        var _vfx_y = (_target.combat_info.grid_y * 32) + 16;
-            
-	        // Chama a função de VFX na posição do alvo
-			show_debug_message("Chama VFX");
-	        _action_data.vfx_function(_vfx_x, _vfx_y);
-			show_debug_message("Executou VFX");
-	    }
-	}
-		
-	// --- LÓGICA DE EXECUÇÃO UNIFICADA ---
-    if (chosen_action.type == "Item") {
-        // Funções de item geralmente precisam de (usuário, alvo)
-        var _target = _is_single_target ? chosen_targets[0] : chosen_targets;
-        _action_data.effect(current_combatant, _target);
-        
-        // Remove o item do inventário após o uso
-		show_debug_message("Preparando para remover item do inventário: " + string(chosen_action.data.name));
-		show_debug_message("ID do item que será removido: " + string(scr_string_to_item_id(chosen_action.data.name)));
-		show_debug_message(global.GameManager.inventory.remove(scr_string_to_item_id(chosen_action.data.name)));
-        //global.GameManager.inventory.remove(scr_string_to_item_id(chosen_action.data.name)); // Ajuste aqui conforme sua implementação
-    } 
-    else { // "Skill" or "Defense", etc.
-        // Funções de skill precisam de (caster, alvo(s), skill_data)
-        var _targets = chosen_targets; // Passa o array completo ou um único alvo dependendo da skill
-        if (_is_single_target) {
-            _targets = chosen_targets[0];
-        }
-		show_debug_message("Action data: " + string(_action_data));
-        _action_data.effect(current_combatant, _targets, _action_data);
-		show_debug_message("Rodou o efeito da skill");
-    }
-    
-    // Limpa a ação e finaliza o turno
-    chosen_action = noone;
-    chosen_targets = noone;
+	chosen_action = noone;
+	chosen_targets = noone;
 	selected_option = 0;
 	skill_menu_selected = 0;
 	can_move = true;
-    scr_battle_controller_end_turn();
+	state = BATTLE_STATE.END_TURN;
+
+	//var _action_data = chosen_action.data;
+	//
+	//show_debug_message("Action data: " + string(_action_data));
+	//var _is_single_target = false;
+	//
+	//if (struct_get(_action_data, "area_of_effect") != undefined){
+	//	_is_single_target = (_action_data.area_of_effect == "SingleTarget");
+	//}
+	//
+	//if (is_callable(_action_data.vfx_function)) {
+	//    // Itera sobre todos os alvos da ação
+	//    for (var i = 0; i < array_length(chosen_targets); i++) {
+	//        var _target = chosen_targets[i];
+    //        
+	//        // Calcula a posição central do alvo em pixels
+	//        var _vfx_x = (_target.combat_info.grid_x * 32) + 16;
+	//        var _vfx_y = (_target.combat_info.grid_y * 32) + 16;
+    //        
+	//        // Chama a função de VFX na posição do alvo
+	//		show_debug_message("Chama VFX");
+	//        _action_data.vfx_function(_vfx_x, _vfx_y);
+	//		show_debug_message("Executou VFX");
+	//    }
+	//}
+	//	
+	//// --- LÓGICA DE EXECUÇÃO UNIFICADA ---
+    //if (chosen_action.type == "Item") {
+    //    // Funções de item geralmente precisam de (usuário, alvo)
+    //    var _target = _is_single_target ? chosen_targets[0] : chosen_targets;
+    //    _action_data.effect(current_combatant, _target);
+    //    
+    //    // Remove o item do inventário após o uso
+	//	show_debug_message("Preparando para remover item do inventário: " + string(chosen_action.data.name));
+	//	show_debug_message("ID do item que será removido: " + string(scr_string_to_item_id(chosen_action.data.name)));
+	//	show_debug_message(global.GameManager.inventory.remove(scr_string_to_item_id(chosen_action.data.name)));
+    //    //global.GameManager.inventory.remove(scr_string_to_item_id(chosen_action.data.name)); // Ajuste aqui conforme sua implementação
+    //} 
+    //else { // "Skill" or "Defense", etc.
+    //    // Funções de skill precisam de (caster, alvo(s), skill_data)
+    //    var _targets = chosen_targets; // Passa o array completo ou um único alvo dependendo da skill
+    //    if (_is_single_target) {
+    //        _targets = chosen_targets[0];
+    //    }
+	//	show_debug_message("Action data: " + string(_action_data));
+    //    _action_data.effect(current_combatant, _targets, _action_data);
+	//	show_debug_message("Rodou o efeito da skill");
+    //}
+    //
+    //// Limpa a ação e finaliza o turno
+    //chosen_action = noone;
+    //chosen_targets = noone;
+	//selected_option = 0;
+	//skill_menu_selected = 0;
+	//can_move = true;
+    //scr_battle_controller_end_turn();
 }
 
 /// @function scr_battle_controller_end_turn()
 /// @description Processa o final do turno de um combatente.
 function scr_battle_controller_end_turn() {
-    show_debug_message("--- Fim do turno de " + current_combatant.character_info.name + " ---");
-
-    var _effects = current_combatant.combat_info.status_effects;
-
-    // Itera de trás para frente para poder remover itens sem pular índices
-    for (var _i = array_length(_effects) - 1; _i >= 0; _i--) {
-        var _effect = _effects[_i];
-        
-        // 1. Decrementa a duração do efeito
-        _effect.turns_remaining--;
-        
-        show_debug_message("Efeito '" + _effect.name + "' agora tem " + string(_effect.turns_remaining) + " turnos restantes.");
-        
-        // 2. Se a duração acabou, remove o efeito da lista
-        if (_effect.turns_remaining <= 0) {
-            array_delete(_effects, _i, 1);
-            show_debug_message("Efeito '" + _effect.name + "' acabou.");
-        }
-    }
+    show_debug_message("--- Fim do turno de " + current_combatant.name + " ---" + _debug_timer());
+	
+	if (array_length(current_combatant.debuff_list) > 0) {
+		for(var i = 0; i < array_length(current_combatant.debuff_list); i++){
+			var debuff = current_combatant.debuff_list[i];
+			debuff.effect();
+		}
+	}
 	
 	// Verificação de Derrota (Game Over)
     var _heroes_alive = 0;
     for (var i = 0; i < array_length(player_party_instances); i++) {
-        if (!player_party_instances[i].combat_info.is_dead) {
+        if (!player_party_instances[i].is_dead) {
             _heroes_alive++;
         }
     }
@@ -627,7 +425,7 @@ function scr_battle_controller_end_turn() {
     // Verificação de Vitória
     var _enemies_alive = 0;
     for (var i = 0; i < array_length(enemy_party_instances); i++) {
-        if (!enemy_party_instances[i].combat_info.is_dead) {
+        if (!enemy_party_instances[i].is_dead) {
             _enemies_alive++;
         }
     }
@@ -641,11 +439,13 @@ function scr_battle_controller_end_turn() {
 
     // Se ninguém ganhou ou perdeu, a batalha continua...
     // 3. Avança a fila de turnos
-    var _combatant_that_acted = array_shift(turn_queue);
-    array_push(turn_queue, _combatant_that_acted);
+    //var _combatant_that_acted = array_shift(turn_queue);
+    //array_push(turn_queue, _combatant_that_acted);
     
     // 4. Muda o estado para o início do próximo turno
     state = BATTLE_STATE.START_TURN;
+	_rotate_turn_queue();
+	show_debug_message("--- Iniciando novo turno... ---" + _debug_timer());
 }
 
 function scr_battle_controller_player_won(){

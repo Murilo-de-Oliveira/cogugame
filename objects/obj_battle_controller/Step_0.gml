@@ -10,22 +10,18 @@ switch(state) {
     
     case BATTLE_STATE.PLAYER_INPUT:
         scr_battle_controller_player_input();
-        break; // Fim do case PLAYER_INPUT
-	
-	case BATTLE_STATE.TARGET_ENEMY:
-		//scr_battle_controller_target_enemy();
-		break;
-	
-	case BATTLE_STATE.TARGET_ALLY:
-		//scr_battle_controller_target_ally();
-		break;
+        break;
 	
 	case BATTLE_STATE.ENEMY_DECISION:
 		//scr_battle_controller_enemy_decision();
 		break;
     
 	case BATTLE_STATE.RESOLVE_ACTION:
-		//scr_battle_controller_resolve_action();
+		scr_battle_controller_resolve_action();
+		break;
+	
+	case BATTLE_STATE.END_TURN:
+		scr_battle_controller_end_turn();
 		break;
 	
 	case BATTLE_STATE.VICTORY:

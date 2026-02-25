@@ -2,21 +2,28 @@ draw_battle_ui();
 
 function draw_battle_ui() {
 	
-	draw_menu_box();
+	if(is_player_turn){
+		draw_menu_box();
 	
-	switch(ui_state) {
-		case UI_BATTLE_MENU_STATE.MAIN_MENU:
-			draw_vertical_menu(main_menu, main_selected);
-			break;
+		switch(ui_state) {
+			case UI_BATTLE_MENU_STATE.MAIN_MENU:
+				draw_vertical_menu(main_menu, main_selected);
+				draw_char_desc();
+				break;
 			
-		case UI_BATTLE_MENU_STATE.SKILL_MENU:
-			draw_skill_menu();
-			break;
+			case UI_BATTLE_MENU_STATE.SKILL_MENU:
+				draw_skill_menu();
+				break;
 			
-		case UI_BATTLE_MENU_STATE.TARGET_SELECT:
-			draw_target_cursor();
-			draw_enemy_desc();
-			break;
+			case UI_BATTLE_MENU_STATE.TARGET_SELECT:
+				draw_target_cursor();
+				draw_enemy_desc();
+				break;
+			
+			case UI_BATTLE_MENU_STATE.BUSY:
+				draw_busy_menu();
+				break;
+		}
 	}
 }
 
@@ -41,6 +48,11 @@ function draw_vertical_menu(_items, _selected) {
 }
 
 function draw_skill_menu() {
+	
+	var x1 = layout.margin_x + layout.menu_width;
+	var y1 = layout.margin_y;
+	var x2 = display_get_gui_width() * 0.97;
+	var y2 = y1 + 180;
 
     draw_vertical_menu(
         array_map(skill_list, function(s) { return s.name; }),
@@ -48,7 +60,12 @@ function draw_skill_menu() {
     );
 
     var skill = skill_list[skill_selected];
-    draw_text(400, layout.margin_y, skill.desc);
+    //draw_text(400, layout.margin_y, skill.description);
+	skill.get_text_ui(400, layout.margin_y);
+	
+	draw_sprite_ext(spr_char_icon_base, 0, x1 + 32, y1 + 16, 4, 4, 0, c_white, 1);
+	
+	draw_rectangle(x1, y1, x2, y2, true);
 }
 
 function draw_target_cursor() {
@@ -84,6 +101,24 @@ function draw_enemy_desc(){
 
 	draw_rectangle(x1, y1, x2, y2, true);
 }
+
+function draw_char_desc(){
+	var char = obj_battle_controller.current_combatant;
+	
+	var x1 = layout.margin_x + layout.menu_width;
+	var y1 = layout.margin_y;
+	var x2 = display_get_gui_width() * 0.97;
+	var y2 = y1 + 180;
+	
+	draw_set_colour(-1);
+	
+	draw_sprite_ext(spr_char_icon_base, 0, x1 + 32, y1 + 16, 4, 4, 0, c_white, 1);
+	char.show_status(x1 + 160, y1 + 16);
+
+	draw_rectangle(x1, y1, x2, y2, true);
+}
+
+function draw_busy_menu(){}
 
 draw_set_font(-1);
 draw_set_colour(-1);
