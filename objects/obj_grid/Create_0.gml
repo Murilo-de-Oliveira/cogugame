@@ -54,15 +54,15 @@ ds_grid_set(global.grid, 6, 4, cell_side);
 ds_grid_set(global.grid, 1, 1, cell_rearguard);
 ds_grid_set(global.grid, 1, 2, cell_rearguard);
 ds_grid_set(global.grid, 1, 3, cell_rearguard);
-ds_grid_set(global.grid, 8, 1, cell_rearguard);
-ds_grid_set(global.grid, 8, 2, cell_rearguard);
-ds_grid_set(global.grid, 8, 3, cell_rearguard);
+ds_grid_set(global.grid, 7, 1, cell_rearguard);
+ds_grid_set(global.grid, 7, 2, cell_rearguard);
+ds_grid_set(global.grid, 7, 3, cell_rearguard);
 
 ds_grid_set(global.grid, 2, 1, cell_vanguard);
 ds_grid_set(global.grid, 2, 2, cell_vanguard);
 ds_grid_set(global.grid, 2, 3, cell_vanguard);
-ds_grid_set(global.grid, 7, 1, cell_vanguard);
-ds_grid_set(global.grid, 7, 2, cell_vanguard);
-ds_grid_set(global.grid, 7, 3, cell_vanguard);
+ds_grid_set(global.grid, 6, 1, cell_vanguard);
+ds_grid_set(global.grid, 6, 2, cell_vanguard);
+ds_grid_set(global.grid, 6, 3, cell_vanguard);
 
 show_debug_message("Grid de batalha inicializado");

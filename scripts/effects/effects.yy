@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"debuffs",
+  "%Name":"effects",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"debuffs",
+  "name":"effects",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

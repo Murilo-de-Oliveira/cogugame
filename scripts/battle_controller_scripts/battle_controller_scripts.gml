@@ -21,15 +21,12 @@ function _rotate_turn_queue(){
 
 function scr_battle_controller_setup(){
 	show_debug_message("Setup iniciado " + _debug_timer());
-	
-	eric = instance_create_layer(0, 0, "Characters", obj_hero);
-	ugu = instance_create_layer(0, 0, "Characters", obj_hero);
-	goblin1 = instance_create_layer(0, 0, "Characters", obj_enemy);
-	goblin2 = instance_create_layer(0, 0, "Characters", obj_enemy);
+
+	eric = instance_create_layer(0, 0, "Instances", obj_hero)
 	eric.create_character(
 		Characters.ERIC,
 		"Eric",
-		{ "idle": spr_eric , "icon": spr_char_icon_base},
+		{ "idle": spr_eric , "icon": spr_char_icon_base, "basic_attack": spr_basic_attack},
 	    {
 	      max_hp: 100,
 	      max_mp: 100,
@@ -43,25 +40,28 @@ function scr_battle_controller_setup(){
 	      lucky: new Attribute(10)
 	    },
 	    {
-	      physical: 1.0,
-	      magic: 1.0,
-	      fire: 1.0,
-	      ice: 1.0,
-	      lightning: 1.0,
-	      dark: 1.0,
-	      divine: 1.0
+	      physical: new Attribute(10),
+	      magic: new Attribute(10),
+	      fire: new Attribute(10),
+	      ice: new Attribute(10),
+	      lightning: new Attribute(10),
+	      dark: new Attribute(10),
+	      divine: new Attribute(10)
 	    },
 		[
-			new Skill("Bola de Fogo", 1, 20, 60, 80, Element.FIRE, Debuffs.BURN, TargetType.ENEMY, "Atira uma bola de fogo no inimigo"),
-			new Skill("Sopro Gélido", 1, 10, 30, 80, Element.ICE, Debuffs.NONE, TargetType.ENEMY, "Sopra ar gelado no inimigo")
+			global.skill_list.fireball,
+			global.skill_list.frost_wind,
+			global.skill_list.dark_bean
 		],
 		3,
 		1
 	);
+	
+	ugu = instance_create_layer(0, 0, "Instances", obj_hero)
 	ugu.create_character(
 		Characters.UGU,
 		"Ugu",
-		{ "idle": spr_eric , "icon": spr_char_icon_base},
+		{ "idle": spr_eric , "icon": spr_char_icon_base, "basic_attack": spr_basic_attack},
 	    {
 	      max_hp: 100,
 	      max_mp: 100,
@@ -75,21 +75,26 @@ function scr_battle_controller_setup(){
 	      lucky: new Attribute(10)
 	    },
 	    {
-	      physical: 1.0,
-	      magic: 1.0,
-	      fire: 1.0,
-	      ice: 1.0,
-	      lightning: 1.0,
-	      dark: 1.0,
-	      divine: 1.0
+	      physical: new Attribute(10),
+	      magic: new Attribute(10),
+	      fire: new Attribute(10),
+	      ice: new Attribute(10),
+	      lightning: new Attribute(10),
+	      dark: new Attribute(10),
+	      divine: new Attribute(10)
 	    },
 		[
-			new Skill("Bola de Fogo", 1, 20, 60, 80, Element.FIRE, Debuffs.BURN, TargetType.ENEMY, "Atira uma bola de fogo no inimigo"),
-			new Skill("Sopro Gélido", 1, 10, 30, 80, Element.ICE, Debuffs.NONE, TargetType.ENEMY, "Sopra ar gelado no inimigo")
+			global.skill_list.fireball,
+			global.skill_list.frost_wind
 		],
 		2,
 		1
 	);
+
+	goblin1 = instance_create_layer(0, 0, "Characters", obj_enemy);
+	goblin2 = instance_create_layer(0, 0, "Characters", obj_enemy);
+	
+	eric.apply_effect(EffectType.BURN, self);
 
 	goblin1.create_character(
 		Characters.UGU,
@@ -108,13 +113,13 @@ function scr_battle_controller_setup(){
 	      lucky: new Attribute(10)
 	    },
 	    {
-	      physical: 1.0,
-	      magic: 1.0,
-	      fire: 1.0,
-	      ice: 1.0,
-	      lightning: 1.0,
-	      dark: 1.0,
-	      divine: 1.0
+	      physical: new Attribute(10),
+	      magic: new Attribute(10),
+	      fire: new Attribute(10),
+	      ice: new Attribute(10),
+	      lightning: new Attribute(10),
+	      dark: new Attribute(10),
+	      divine: new Attribute(10)
 	    },
 		[],
 		6,
@@ -138,13 +143,13 @@ function scr_battle_controller_setup(){
 	      lucky: new Attribute(10)
 	    },
 	    {
-	      physical: 1.0,
-	      magic: 1.0,
-	      fire: 1.0,
-	      ice: 1.0,
-	      lightning: 1.0,
-	      dark: 1.0,
-	      divine: 1.0
+	      physical: new Attribute(10),
+	      magic: new Attribute(10),
+	      fire: new Attribute(10),
+	      ice: new Attribute(10),
+	      lightning: new Attribute(10),
+	      dark: new Attribute(10),
+	      divine: new Attribute(10)
 	    },
 		[],
 		6,
@@ -175,6 +180,16 @@ function scr_battle_controller_setup(){
 		var _desired_position = [_enemy.grid_x, _enemy.grid_y];
 		
 		scr_set_occupant(_desired_position[0], _desired_position[1], _enemy);
+		
+		var _combat_position = scr_get_cell_info(_desired_position[0], _desired_position[1]);
+		switch (_combat_position.cell_type){
+			case CombatPosition.VANGUARD:
+				array_push(enemy_list_vanguard, _enemy);
+				break;
+			case CombatPosition.REARGUARD:
+				array_push(enemy_list_rearguard, _enemy);
+				break;
+		}
 	}
 	
 	turn_queue = array_concat(player_party_instances, enemy_party_instances);
@@ -182,11 +197,11 @@ function scr_battle_controller_setup(){
 	for(var i = 0; i < array_length(turn_queue); i++){
 		show_debug_message(turn_queue[i].name);
 	}
-
-	//if !instance_exists(obj_cursor){
-	//	instance_create_layer(0, 0, "Instances", obj_cursor);
-	//	show_debug_message("Cursor criado");
-	//}
+	
+	show_debug_message("Lista de inimigos na Vanguarda:");
+	show_debug_message(enemy_list_vanguard);
+	show_debug_message("Lista de inimigos na Retaguarda:");
+	show_debug_message(enemy_list_rearguard);
 	
 	if !instance_exists(obj_ui_battle_banner){
 		instance_create_layer(
@@ -197,8 +212,8 @@ function scr_battle_controller_setup(){
 		);
 	}
 	
-	if (!instance_exists(obj_ui_menu)) {
-		instance_create_layer(0, 0, "Instances", obj_ui_menu);
+	if (!instance_exists(obj_ui_combat_menu)) {
+		instance_create_layer(0, 0, "Instances", obj_ui_combat_menu);
 	}
 	
 	show_debug_message("Setup finalizado " + _debug_timer());
@@ -210,9 +225,6 @@ function scr_battle_controller_start_turn(){
 	current_combatant = array_first(turn_queue);
 	
 	show_debug_message("--- Início do turno de " + current_combatant.name +  " ---" + _debug_timer());
-	
-	//obj_cursor.update_position(current_combatant);
-	obj_cursor.is_visible = true;
 	
 	if (current_combatant.is_dead) {
         show_debug_message(current_combatant.name + " está fora de combate. Pulando turno.");
@@ -234,15 +246,10 @@ function scr_battle_controller_start_turn(){
 }
 
 function scr_battle_controller_player_input(){
-	obj_ui_menu.is_player_turn = true;
-	
-	obj_ui_menu.current_combatant_icon = current_combatant.sprites[$ "idle"];
-	
-	if obj_ui_menu.ui_state == UI_BATTLE_MENU_STATE.BUSY{
-		state = BATTLE_STATE.RESOLVE_ACTION;
-		show_debug_message("Em estado de resolve action " + _debug_timer());
-		obj_ui_menu.ui_state = UI_BATTLE_MENU_STATE.MAIN_MENU;
-		obj_ui_menu.is_player_turn = false;
+	if(!obj_ui_combat_menu.is_player_turn){
+		obj_ui_combat_menu.is_player_turn = true;
+		obj_ui_combat_menu.ui_state = UI_BATTLE_MENU_STATE.MAIN_MENU;
+		obj_ui_combat_menu.current_combatant_icon = current_combatant.sprites[$ "idle"];
 	}
 }
 
@@ -326,6 +333,9 @@ function scr_battle_controller_resolve_action() {
 	
 	show_debug_message("Ação será commitada");
 	
+	show_debug_message("--- Iniciando animação de ataque ---" + _debug_timer());
+	//current_combatant.play_attack_animation(chosen_action);
+	
 	commit_action(
 		chosen_action,
 		chosen_targets
@@ -400,9 +410,9 @@ function scr_battle_controller_resolve_action() {
 function scr_battle_controller_end_turn() {
     show_debug_message("--- Fim do turno de " + current_combatant.name + " ---" + _debug_timer());
 	
-	if (array_length(current_combatant.debuff_list) > 0) {
-		for(var i = 0; i < array_length(current_combatant.debuff_list); i++){
-			var debuff = current_combatant.debuff_list[i];
+	if (array_length(current_combatant.effect_list) > 0) {
+		for(var i = 0; i < array_length(current_combatant.effect_list); i++){
+			var debuff = current_combatant.effect_list[i];
 			debuff.effect();
 		}
 	}

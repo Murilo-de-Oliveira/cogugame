@@ -85,8 +85,16 @@ enum Element {
 }
 
 enum TargetType {
-    ALLY,
-    ENEMY
+	SINGLE_ALLY,
+	SINGLE_ENEMY,
+	ALL_ALIES,
+	ALL_ENEMIES,
+	VANGUARD_ALLY,
+	VANGUARD_ENEMY,
+	REARGUARD_ALLY,
+	REARGUARD_ENEMY,
+	SIDE_ALLY,
+	SIDE_ENEMY
 }
 
 enum CombatPosition {
@@ -99,4 +107,11 @@ enum CombatPosition {
 enum Characters {
 	ERIC,
 	UGU
+}
+
+enum EffectType {
+	NONE,
+	STUN,
+	BURN,
+	COUNT
 }

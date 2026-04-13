@@ -14,9 +14,10 @@ timer--;
 // A alpha começa em 1 e vai até 0. A escala começa em 1.5 e vai até 1.
 var _life_percent = timer / duration;
 alpha = _life_percent;
-scale = lerp(1, 1.5, _life_percent); // lerp() interpola suavemente entre dois valores
+scale = lerp(1, 0.5, _life_percent); // lerp() interpola suavemente entre dois valores
 
 // Autodestruição
 if (timer <= 0) {
+	show_debug_message("Se destruiu");
     instance_destroy();
 }

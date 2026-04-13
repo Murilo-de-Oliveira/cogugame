@@ -10,14 +10,15 @@ draw_set_valign(fa_middle);
 draw_set_font(fnt_ui_main); // Use a fonte que preferir
 
 var _outline_color = c_black;
-draw_text_transformed_color(x + 1, y, text, scale, scale, 0, _outline_color, _outline_color, _outline_color, _outline_color, alpha);
-draw_text_transformed_color(x - 1, y, text, scale, scale, 0, _outline_color, _outline_color, _outline_color, _outline_color, alpha);
-draw_text_transformed_color(x, y + 1, text, scale, scale, 0, _outline_color, _outline_color, _outline_color, _outline_color, alpha);
-draw_text_transformed_color(x, y - 1, text, scale, scale, 0, _outline_color, _outline_color, _outline_color, _outline_color, alpha);
+//draw_text_transformed_color(x + 1, y, text, scale, scale, 0, _outline_color, _outline_color, _outline_color, _outline_color, alpha);
+//draw_text_transformed_color(x - 1, y, text, scale, scale, 0, _outline_color, _outline_color, _outline_color, _outline_color, alpha);
+//draw_text_transformed_color(x, y + 1, text, scale, scale, 0, _outline_color, _outline_color, _outline_color, _outline_color, alpha);
+//draw_text_transformed_color(x, y - 1, text, scale, scale, 0, _outline_color, _outline_color, _outline_color, _outline_color, alpha);
 
 // Agora, desenha o texto principal por cima
-draw_text_transformed_color(x, y, text, scale, scale, 0, color, color, color, color, alpha);
+//draw_text_transformed_color(x, y, text, scale, scale, 0, color, color, color, color, alpha);
 
 // Reseta o alinhamento para não afetar outros objetos
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);
+draw_set_font(-1);
